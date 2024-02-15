@@ -37,7 +37,14 @@ int main()
 			char **cmd = l->seq[i];
 			printf("seq[%d]: ", i);
 			for (j=0; cmd[j]!=0; j++) {
-				printf("%s ", cmd[j]);
+				if(!strcmp("#", cmd[j])) {
+					break;
+				} else if(!strcmp("quit", cmd[j])) {
+					printf("\n");
+					return 0;
+				} else {
+					printf("%s ", cmd[j]);
+				}
 			}
 			printf("\n");
 		}
