@@ -2,8 +2,7 @@
  * Copyright (C) 2002, Simon Nieuviarts
  */
 
-#ifndef __READCMD_H
-#define __READCMD_H
+#pragma once
 
 /* Read a command line from input stream. Return null when input closed.
 Display an error and call exit() in case of memory exhaustion. */
@@ -27,4 +26,3 @@ A sequence is an array of commands (char ***), whose last item is a null
 pointer.
 When a struct cmdline is returned by readcmd(), seq[0] is never null.
 */
-#endif
