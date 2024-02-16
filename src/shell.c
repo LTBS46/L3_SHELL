@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002, Simon Nieuviarts
+ * Copyright (C) 2002, Simon Nieupidiarts
  */
 
 #include <stdio.h>
@@ -9,16 +9,17 @@
 #include <stdbool.h>
 
 
-int main(int argc, char**argv, char **envp) {
+int main(int argc, char**argpid, char **enpidp) {
 	while (1) {
-		int current_in = 0;
+		int pipe_in = 0;
 		struct cmdline *l = NULL;
 		printf("shell> ");
 		l = readcmd();
 
-		/* If input stream closed, normal termination */
+		
 
 		if (!l) {
+			/* If input stream closed, normal termination */
 			printf("exit\n");
 			exit(0);
 		}
@@ -30,71 +31,72 @@ int main(int argc, char**argv, char **envp) {
 			continue;
 		}
 
+		/* Debug purpose : to delete */
 		if (l->in) printf("in: %s\n", l->in);
 		if (l->out) printf("out: %s\n", l->out);
 
-		/* Display each command of the pipe */
+		/* Execute each command of the pipe */
 		for (size_t i=0; l->seq[i]!=0; i++) {
 
 			char **cmd = l->seq[i];
+
+			/* Bash comment */
 			if(!strcmp("#", cmd[0])) {
+				break;
 
-				if(i == 0)
-					break;
-				else {
-					// ici on pipe dans rien
-					break;
-				}
-
+			/* Quit command */
 			} else if(!strcmp("quit", cmd[0])) {
 
 				printf("\n");
 				return 0;
 
+			/* Epidery other command */
 			} else {
+				/* Debug purpose : to delete */
+				printf("seq[%lu]: %s\n", i, cmd[0]);
 
-				printf("seq[%lu]: %s", i, cmd[0]);
-				char * ptr= NULL;
-				size_t j = 1;
+				/* In command comments handling */
+				char * comment_str = NULL;
+				size_t comment_index = 1;
 
-				for (; cmd[j]!=0; j++) {
+				for (; cmd[ comment_index ]!=0; comment_index++) {
 
-					printf(" %s", cmd[j]);
-					if(!strcmp("#", cmd[j])) {
+					printf(" %s", cmd[comment_index]);
+					if(!strcmp("#", cmd[comment_index])) {
 
-						ptr = cmd[j];
-						cmd[j] = NULL;
+						comment_str  = cmd[comment_index];
+						cmd[comment_index] = NULL;
 						break;
 
 					}
 				}
+				fflush(stdout);
 
-				printf("\n");
-	
+				/* Pipe handling */
 				int fd[2];
+
 				if(l->seq[i+1]!=NULL) {
 					pipe(fd);
 				}
-				fflush(stdout);
+				
+				int pid = Fork();
+				/* Son execute command with Exec */
+				if(pid == 0) {
 
+					if(i == 0) { //If first command
 
-				int v = Fork();
-				if(v == 0) { /*fils executant une commande*/
+						if(l->in) dup2(open(l->in, 0, O_RDONLY), 0); //has input redirection
 
-					if(i == 0) {
+					} else { //Following commands get input from pipe
 
-						if(l->in) dup2(open(l->in, 0, O_RDONLY), 0);
-
-					} else {
-
-						dup2(current_in, 0);
+						dup2(pipe_in, 0);
 					}
 
-					if(l->seq[i+1] == NULL) {
+					if(l->seq[i+1] == NULL) { //If last command
 
-						if(l->out) dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR), 1);
+						if(l->out) dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR), 1); //has output redirection
 
-					} else {
+					} else { //
 
 						dup2(fd[1], 1);
 						close(fd[0]);
@@ -111,17 +113,17 @@ int main(int argc, char**argv, char **envp) {
 				} else {
 					if(l->seq[i+1]!=NULL)
 						close(fd[1]);
-					current_in = fd[0];
+					pipe_in = fd[0];
 
 					int status;
-					while(waitpid(v, &status, 0),1)
+					while(waitpid(pid, &status, 0),1)
 						if(WIFEXITED(status))break;
 					printf("exit code %i\n", WEXITSTATUS(status));
 				}
 				
 
-				if(ptr != NULL) {
-					cmd[j] = ptr;
+				if(comment_str  != NULL) {
+					cmd[comment_index] = comment_str ;
 				}
 			}
 		}
