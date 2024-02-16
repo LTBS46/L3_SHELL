@@ -1,0 +1,4 @@
+#
+# test05.txt - Exécuter une commande avec arguments
+#
+ls -1

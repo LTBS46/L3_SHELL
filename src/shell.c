@@ -130,7 +130,7 @@ int main(int argc, char**argv, char **envp) {
 					int status;
 
 					/* Wait son */
-					while(waitpid(pid, &status, 0),1)q
+					while(waitpid(pid, &status, 0),1)
 						if(WIFEXITED(status))break;
 				}
 				
