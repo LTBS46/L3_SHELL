@@ -12,7 +12,7 @@
 int main(int argc, char**argv, char **envp) {
 	while (1) {
 		int current_in = 0;
-		struct cmdline *l;
+		struct cmdline *l = NULL;
 		printf("shell> ");
 		l = readcmd();
 
@@ -80,17 +80,21 @@ int main(int argc, char**argv, char **envp) {
 						close(fd[0]);
 					}
 
-					execvp(cmd[0],cmd); //ne marche pas si la commande a son PATH complet
+					execvp(cmd[0], cmd); //ne marche pas si la commande a son PATH complet
 					switch(errno) {
 						
+						default:
+							return 0;	
 					}
 					return 0;
 				} else {
-					close(fd[1]);
+					if(l->seq[i+1]!=NULL)
+						close(fd[1]);
 					current_in = fd[0];
 					int status;
 					while(waitpid(v, &status, 0),1)
 						if(WIFEXITED(status))break;
+					printf("exit code %i\n", WEXITSTATUS(status));
 				}
 				
 
