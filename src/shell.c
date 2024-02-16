@@ -10,6 +10,9 @@
 
 
 int main(int argc, char**argv, char **envp) {
+
+
+	
 	while (1) {
 		int pipe_in = 0;
 		struct cmdline *l = NULL;
@@ -130,8 +133,7 @@ int main(int argc, char**argv, char **envp) {
 					int status;
 
 					/* Wait son */
-					while(waitpid(pid, &status, 0),1)
-						if(WIFEXITED(status))break;
+					if(!(l->is_background)) while(waitpid(pid, &status, 0),1) if(WIFEXITED(status))break;
 				}
 				
 				
