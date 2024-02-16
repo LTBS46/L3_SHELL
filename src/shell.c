@@ -34,10 +34,6 @@ int main(int argc, char**argv, char **envp) {
 			continue;
 		}
 
-		/* Debug purpose : to delete */
-		if (l->in) printf("in: %s\n", l->in);
-		if (l->out) printf("out: %s\n", l->out);
-
 		/* Execute each command of the pipe */
 		for (size_t i=0; l->seq[i]!=0; i++) {
 
@@ -51,11 +47,6 @@ int main(int argc, char**argv, char **envp) {
 
 			/* Every other command */
 			} else {
-				if(l->is_background) {
-					printf("c'est du background whaou!!!!\n");
-				}
-
-				fflush(stdout);
 
 				/* Pipe handling */
 				int fd[2];
@@ -94,13 +85,12 @@ int main(int argc, char**argv, char **envp) {
 
 					execvp(cmd[0], cmd); //Si la commande est executée avec un PATH absolu : son argv[0] vaudra le PATH absolu
 
-					/* Debug purpose : to delete */
 					perror("exec failed");
 
 					return errno;
 
 				} else {
-					/* Father (shell) wait forhis son */
+					/* Father (shell) wait for his son */
 
 					if(l->seq[i+1]!=NULL)
 						close(fd[1]); //Close pipe input
@@ -116,13 +106,6 @@ int main(int argc, char**argv, char **envp) {
 					/* Zombi children collect */
 					waitpid(-1, NULL, WNOHANG|WUNTRACED);
 				}
-				
-				
-				if(comment_str  != NULL) {
-					cmd[comment_index] = comment_str ;	
-					break;
-				}
-
 			}
 		}
 	}
