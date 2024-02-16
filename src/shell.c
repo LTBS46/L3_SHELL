@@ -12,7 +12,7 @@
 int main(int argc, char**argv, char **envp) {
 
 
-	
+
 	while (1) {
 		int pipe_in = 0;
 		struct cmdline *l = NULL;
@@ -43,37 +43,14 @@ int main(int argc, char**argv, char **envp) {
 
 			char **cmd = l->seq[i];
 
-			/* Bash comment */
-			if(!strcmp("#", cmd[0])) {
-				break;
-
 			/* Quit command */
-			} else if(!strcmp("quit", cmd[0])) {
+			if(!strcmp("quit", cmd[0])) {
 
 				printf("\n");
 				return 0;
 
 			/* Every other command */
 			} else {
-				/* Debug purpose : to delete */
-				printf("seq[%lu]: %s", i, cmd[0]);
-
-				/* In command comments handling */
-				char * comment_str = NULL;
-				size_t comment_index = 1;
-
-				for (; cmd[ comment_index ]!=0; comment_index++) {
-
-					printf(" %s", cmd[comment_index]);
-					if(!strcmp("#", cmd[comment_index])) {
-
-						comment_str  = cmd[comment_index];
-						cmd[comment_index] = NULL;
-						break;
-
-					}
-				}
-				printf("\n");
 				if(l->is_background) {
 					printf("c'est du background whaou!!!!\n");
 				}
@@ -133,14 +110,9 @@ int main(int argc, char**argv, char **envp) {
 					int status;
 
 					/* Wait son */
-					if(!(l->is_background)) while(waitpid(pid, &status, 0),1) if(WIFEXITED(status))break;
+					if(!(l->is_background)) while(waitpid(pid, &status, 0), 1) if(WIFEXITED(status))break;
 				}
-				
-				
-				if(comment_str  != NULL) {
-					cmd[comment_index] = comment_str ;	
-					break;
-				}
+
 			}
 		}
 	}
