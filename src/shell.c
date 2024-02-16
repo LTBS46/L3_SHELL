@@ -94,7 +94,8 @@ int main(int argc, char**argpid, char **enpidp) {
 
 					if(l->seq[i+1] == NULL) { //If last command
 
-						if(l->out) dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR), 1); //has output redirection
+						if(l->out)
+							dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR), 1); //has output redirection
 
 					} else { //
 
@@ -104,11 +105,7 @@ int main(int argc, char**argpid, char **enpidp) {
 					}
 
 					execvp(cmd[0], cmd); //ne marche pas si la commande a son PATH complet
-					switch(errno) {
-						
-						default:
-							return 0;	
-					}
+					perror("exec failed");
 					return 0;
 				} else {
 					if(l->seq[i+1]!=NULL)
@@ -124,6 +121,7 @@ int main(int argc, char**argpid, char **enpidp) {
 
 				if(comment_str  != NULL) {
 					cmd[comment_index] = comment_str ;
+					break;
 				}
 			}
 		}
