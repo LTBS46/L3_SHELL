@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <ctype.h>
 #include "readcmd.h"
 
 
@@ -161,7 +162,7 @@ struct cmdline *readcmd(void)
 	char **cmd;
 	char ***seq;
 	size_t cmd_len, seq_len;
-
+	bool is_background = false;
 	line = readline();
 	if (line == NULL) {
 		if (s) {
@@ -169,6 +170,31 @@ struct cmdline *readcmd(void)
 			free(s);
 		}
 		return static_cmdline = 0;
+	} 
+	
+	{
+
+	size_t i = 0;
+
+	while(line[i] != '\0') {
+		if(line[i] == '#') {
+			line[i] = '\0';
+		} else {
+			i+=1;
+		}
+	}
+
+	for(; i > 0; i-=1) {
+		if(isgraph(line[i])) {
+			if(line[i] == '&') {
+				line[i] = '\0';
+				is_background = true;
+			} else {
+				break;
+			}
+		}
+	}
+
 	}
 
 	cmd = xmalloc(sizeof(char *));
@@ -189,6 +215,7 @@ struct cmdline *readcmd(void)
 	s->in = 0;
 	s->out = 0;
 	s->seq = 0;
+	s->is_background = is_background;
 
 	i = 0;
 	while ((w = words[i++]) != 0) {

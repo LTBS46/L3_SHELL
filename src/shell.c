@@ -53,7 +53,7 @@ int main(int argc, char**argv, char **envp) {
 			/* Every other command */
 			} else {
 				/* Debug purpose : to delete */
-				printf("seq[%lu]: %s\n", i, cmd[0]);
+				printf("seq[%lu]: %s", i, cmd[0]);
 
 				/* In command comments handling */
 				char * comment_str = NULL;
@@ -70,6 +70,11 @@ int main(int argc, char**argv, char **envp) {
 
 					}
 				}
+				printf("\n");
+				if(l->is_background) {
+					printf("c'est du background whaou!!!!\n");
+				}
+
 				fflush(stdout);
 
 				/* Pipe handling */
