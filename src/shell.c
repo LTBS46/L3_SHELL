@@ -110,7 +110,17 @@ int main(int argc, char**argv, char **envp) {
 					int status;
 
 					/* Wait son */
-					if(!(l->is_background)) while(waitpid(pid, &status, 0), 1) if(WIFEXITED(status))break;
+					if(!(l->is_background)){
+						 while(waitpid(pid, &status, 0),1) if(WIFEXITED(status))break;
+					}
+					/* Zombi children collect */
+					waitpid(-1, NULL, WNOHANG|WUNTRACED);
+				}
+				
+				
+				if(comment_str  != NULL) {
+					cmd[comment_index] = comment_str ;	
+					break;
 				}
 
 			}
