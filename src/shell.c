@@ -8,7 +8,20 @@
 #include "csapp.h"
 #include <stdbool.h>
 
-int run_cmd(struct cmdline *l, size_t i, int pipe_in) {
+// sry j'ai pas mieux
+static int nope = 0;
+
+void sigchld_handler(int sig){
+	/* Children handler */
+	if(!nope)
+	while(1) {
+		int s;
+		waitpid(-1, &s, WNOHANG | WUNTRACED);
+		if(!WIFEXITED(s)) break;
+	}
+}
+
+int run_cmd(struct cmdline *l, size_t i, int pipe_in, pid_t * pid_slot) {
 	char **cmd = l->seq[i];
 	/* Pipe handling */
 	int fd[2];
@@ -25,7 +38,7 @@ int run_cmd(struct cmdline *l, size_t i, int pipe_in) {
 		if(i == 0) { //If first command
 
 			if(l->in) dup2(open(l->in, 0, O_RDONLY), 0); //has input redirection
-
+              
 		} else { //Else following commands get input from pipe
 
 			dup2(pipe_in, 0);
@@ -36,6 +49,8 @@ int run_cmd(struct cmdline *l, size_t i, int pipe_in) {
 
 			if(l->out)
 				dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR | S_IWUSR), 1); //has output redirection
+
+/* OPEN ERROR HANDLING */
 
 		} else { //Else previous commands output on stdout
 
@@ -54,23 +69,21 @@ int run_cmd(struct cmdline *l, size_t i, int pipe_in) {
 
 	/* Father (shell) wait for his son */
 
+	*pid_slot = pid;
+
 	if(l->seq[i+1]!=NULL)
 		close(fd[1]); //Close pipe input
 
-	int status;
 
-	/* Wait son */
-	if(!(l->is_background)){
-		while(waitpid(pid, &status, 0),1) if(WIFEXITED(status))break;
-	}
-
-	/* Zombi children collect */
-	waitpid(-1, NULL, WNOHANG | WUNTRACED);
 	return fd[0];
 }
 
 
 int main(int argc, char**argv, char **envp) {
+
+	/* Handler for children */
+	Signal(SIGCHLD,sigchld_handler);
+
 	while (1) {
 		int pipe_in = 0;
 		struct cmdline *l = NULL;
@@ -92,7 +105,14 @@ int main(int argc, char**argv, char **envp) {
 		}
 
 		/* Execute each command of the pipe */
-		for (size_t i=0; l->seq[i]!=0; i++) {
+
+		size_t s=0;
+		while (l->seq[s]!=0) s++;
+
+
+		pid_t pids[s-1];
+		if(!l->is_background)nope = 1;
+		for (size_t i=0; i<s; i++) {
 
 			char **cmd = l->seq[i];
 
@@ -104,8 +124,22 @@ int main(int argc, char**argv, char **envp) {
 
 			/* Every other command */
 			} else {
-				pipe_in = run_cmd(l, i, pipe_in);
+				pipe_in = run_cmd(l, i, pipe_in, &(pids[i]));
 			}
+		}
+
+
+		int status;
+		if(!(l->is_background)) {
+			for (size_t i = 0; i < s; i++) {
+				printf("waiting now on %d, n°%lu\n", pids[i], i);
+				while(waitpid(pids[i], &status, 0), 1) {
+					printf("%x\n", status);
+					if(WIFEXITED(status))
+						break;
+				}
+			}
+			nope = 0;
 		}
 	}
 }
