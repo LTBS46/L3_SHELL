@@ -1,4 +1,8 @@
 #
 # test05.txt - Exécuter une commande avec arguments
+# Commandes avec de 1 à 3 arguments
 #
-ls -1
+ps f
+ls -l -a
+/usr/bin/ls .. -1 -a
+quit

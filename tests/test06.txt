@@ -1,0 +1,7 @@
+#
+# test06.txt - Exécuter une commande avec des tubes
+# processus systemd et leur nombre
+#
+ps aux | grep systemd
+ps aux | grep systemd | wc -l
+quit
