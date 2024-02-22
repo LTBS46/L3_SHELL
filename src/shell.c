@@ -60,9 +60,9 @@ int run_cmd(struct cmdline *l, size_t i, int pipe_in, pid_t * pid_slot) {
 
 		}
 
-		execvp(cmd[0], cmd); //Si la commande est executée avec un PATH absolu : son argv[0] vaudra le PATH absolu
+		execvp(cmd[0], cmd); 
 
-		perror("exec failed");
+		perror(cmd[0]);
 
 		exit(errno);
 	} 
@@ -72,7 +72,7 @@ int run_cmd(struct cmdline *l, size_t i, int pipe_in, pid_t * pid_slot) {
 	*pid_slot = pid;
 
 	if(l->seq[i+1]!=NULL)
-		close(fd[1]); //Close pipe input
+		close(fd[1]); //At last command father close pipe input
 
 
 	return fd[0];
@@ -132,9 +132,9 @@ int main(int argc, char**argv, char **envp) {
 		int status;
 		if(!(l->is_background)) {
 			for (size_t i = 0; i < s; i++) {
-				printf("waiting now on %d, n°%lu\n", pids[i], i);
+				//printf("waiting now on %d, n°%lu\n", pids[i], i);
 				while(waitpid(pids[i], &status, 0), 1) {
-					printf("%x\n", status);
+					//printf("%x\n", status);
 					if(WIFEXITED(status))
 						break;
 				}

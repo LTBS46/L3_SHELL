@@ -6,8 +6,6 @@ cat .gitignore > toto
 
 wc -l < toto
 
-grep "\." < toto | wc -l > titi
-
-cat titi
+grep "\." < toto | wc -l
 
 CLOSE
