@@ -1,17 +1,13 @@
 #
 # test07.txt - Exécuter une commande avec des redirections et des pipes
-# 
+# ca marche po 
 #
-cat .gitignore > toto # Redirection de sortie 
+cat .gitignore > toto
 
-wc -l < toto # Redirection d'entrée
+wc -l < toto
 
-grep "#" < toto | wc -l > nb_commentaires.gitignore # Redirection sortie et entrée avec un pipes
+grep "\." < toto | wc -l > titi
 
-# Affichage du contenu du fichier
-cat nb_commentaires.gitignore
+cat titi
 
-# Suppression des fichiers
-rm toto
-rm nb_commentaires.gitignore
-quit
+CLOSE

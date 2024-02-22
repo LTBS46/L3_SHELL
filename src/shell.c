@@ -8,7 +8,8 @@
 #include "csapp.h"
 #include <stdbool.h>
 
-int run_cmd(char**cmd, int pipe_in) {
+int run_cmd(struct cmdline *l, size_t i, int pipe_in) {
+	char **cmd = l->seq[i];
 	/* Pipe handling */
 	int fd[2];
 	if(l->seq[i+1]!=NULL) {
@@ -34,7 +35,7 @@ int run_cmd(char**cmd, int pipe_in) {
 		if(l->seq[i+1] == NULL) { //If last command
 
 			if(l->out)
-				dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR), 1); //has output redirection
+				dup2(open(l->out, O_WRONLY | O_CREAT , S_IRUSR | S_IWUSR), 1); //has output redirection
 
 		} else { //Else previous commands output on stdout
 
@@ -103,7 +104,7 @@ int main(int argc, char**argv, char **envp) {
 
 			/* Every other command */
 			} else {
-				pipe_in = run_cmd(cmd, pipe_in);
+				pipe_in = run_cmd(l, i, pipe_in);
 			}
 		}
 	}

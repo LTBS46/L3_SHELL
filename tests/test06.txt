@@ -4,4 +4,4 @@
 #
 ps aux | grep systemd
 ps aux | grep systemd | wc -l
-quit
+CLOSE

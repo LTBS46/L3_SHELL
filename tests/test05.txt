@@ -5,4 +5,4 @@
 ps f
 ls -l -a
 /usr/bin/ls .. -1 -a
-quit
+CLOSE
