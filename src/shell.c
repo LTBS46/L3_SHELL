@@ -103,8 +103,9 @@ int main(int argc, char**argv, char **envp) {
 					if(!(l->is_background)){
 						 while(waitpid(pid, &status, 0),1) if(WIFEXITED(status))break;
 					}
+
 					/* Zombi children collect */
-					waitpid(-1, NULL, WNOHANG|WUNTRACED);
+					waitpid(-1, NULL, WNOHANG | WUNTRACED);
 				}
 			}
 		}
